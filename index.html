@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+        <style type="text/css">
+            td, input{ 
+                width: 40px; 
+                height: 40px; 
+                text-align: center;
+                font-size: 32px;
+            }
+            td {
+                border-style: solid;
+                border-width: 2px;
+                padding: 0px;
+                margin: 0px;
+            }
+        </style>
+    </head>
+	<body>
+        <div class="container">
+            <div class="header">
+    		  <h3 class="text-muted">ScriptEd Sudoku</h3>
+            </div> 
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <table data-bind="foreach: rows">
+                        <tr data-bind="foreach: columns">
+                            <td><input type="text" data-bind="value: $data" /></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+	</body>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/knockout-3.0.0.js"></script>
+    <script src="js/sudoku.js"> </script>
+    <script>
+        var model = new sudoku();
+        ko.applyBindings(model);
+        model.createPuzzle();
+    </script>
+</html>
+
