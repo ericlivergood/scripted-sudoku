@@ -24,9 +24,21 @@ var sudoku = function(){
                     cell.value(staticPuzzle[i][j]);
                     cell.isPuzzleProvided(true);
                 }
-                self.rows()[i].columns.push(cell)
+                self.rows()[i].columns.push(cell);
             }
         }
+    }
+
+    self.checkPuzzle = function() {
+    }    
+    self.resetPuzzle = function() {
+        ko.utils.arrayForEach(self.rows(), function(row){
+            ko.utils.arrayForEach(row.columns(), function(col){
+                if(!col.isPuzzleProvided()){
+                    col.value(null);
+                }
+            });
+        });
     }
 }
 
