@@ -2,6 +2,13 @@ var puzzleRow = function(){
     var self = this;
     self.columns = ko.observableArray();
 }
+
+var puzzleCell = function(){
+    var self = this;
+    self.value = ko.observable();
+    self.isPuzzleProvided = ko.observable(false);
+}
+
 var sudoku = function(){
     var self = this;
     self.rows = ko.observableArray();
@@ -11,7 +18,13 @@ var sudoku = function(){
         for(var i = 0; i < 9; i++){
             self.rows.push(new puzzleRow());
             for(var j = 0; j < 9; j++){
-                self.rows()[i].columns.push(staticPuzzle[i][j])
+                var cell = new puzzleCell();
+
+                if(staticPuzzle[i][j]){
+                    cell.value(staticPuzzle[i][j]);
+                    cell.isPuzzleProvided(true);
+                }
+                self.rows()[i].columns.push(cell)
             }
         }
     }

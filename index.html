@@ -26,7 +26,7 @@
                 <div class="col-md-6 col-md-offset-3">
                     <table data-bind="foreach: rows">
                         <tr data-bind="foreach: columns">
-                            <td><input type="text" data-bind="value: $data" /></td>
+                            <td><input type="text" data-bind="value: value, disable: isPuzzleProvided" /></td>
                         </tr>
                     </table>
                 </div>
