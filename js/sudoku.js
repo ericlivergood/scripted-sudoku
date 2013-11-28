@@ -14,7 +14,17 @@ var sudoku = function(){
     var self = this;
     self.rows = ko.observableArray();
     self.columns = ko.computed(function(){
-        return [];
+        var cols = []
+        for(var i = 0; i < 9; i++){
+            cols.push([])
+            for(var j  = 0; j < 9; j++){
+                if(self.rows()[j]){
+                    cols[i][j] = self.rows()[j].columns()[i];
+                }
+            }
+        }
+
+        return cols;
     });
 
     self.regions = ko.computed(function(){
@@ -100,6 +110,7 @@ var sudoku = function(){
                 if(!col.isPuzzleProvided()){
                     col.value(null);
                 }
+                col.isIncorrect(false); 
             });
         });
     }
