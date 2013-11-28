@@ -17,7 +17,7 @@ var sudoku = function(){
         var cols = []
         for(var i = 0; i < 9; i++){
             cols.push([])
-            for(var j  = 0; j < 9; j++){
+            for(var j  = 0; j < 9; j    ++){
                 if(self.rows()[j]){
                     cols[i][j] = self.rows()[j].columns()[i];
                 }
@@ -45,6 +45,35 @@ var sudoku = function(){
                 self.rows()[i].columns.push(cell);
             }
         }
+    }
+
+
+    self._createRandomPuzzle = function(blanks){
+        var rotationsToAttempt = 1000;
+        var maxCellsPerRotation = 10;
+        var puzz = staticBase;
+
+        //take the base puzzle and try rotating some cells
+        //if still valid, leave them; otherwise put them back
+        for(var i = 0; i < rotationsToAttempt; i++){
+            var cellsToRotate = (Math.floor(Math.random()*100)%(maxCellsPerRotation-3)+3; //we want to always rotate at least 3
+
+            var current = _getRandomPair();
+            for(int j = 0; j < cellsToRotate; j++){
+                pairs.push(_getRandomPair());
+            }
+        }
+
+        //remove some of the values
+
+        //return what's left
+    }
+
+    self._getRandomPair(){
+        return [
+            (Math.floor(Math.random()*100))%9,
+            (Math.floor(Math.random()*100))%9
+        ];
     }
 
     self.checkPuzzle = function() {
@@ -126,4 +155,16 @@ var staticPuzzle = [
 , [8, , ,7,5, ,4,1, ]
 , [ , , , , , , ,5,9]
 , [3,2, ,1, , ,6, ,8]
+]
+
+var staticBase = [
+  [1,2,3,4,5,6,7,8,9]
+, [4,5,6,7,8,9,1,2,3]
+, [7,8,9,1,2,3,4,5,6]
+, [2,3,4,5,6,7,8,9,1]
+, [5,6,7,8,9,1,2,3,4]
+, [8,9,1,2,3,4,5,6,7]
+, [3,4,5,6,7,8,9,1,2]
+, [6,7,8,9,1,2,3,4,5]
+, [9,1,2,3,4,5,6,7,8]
 ]
