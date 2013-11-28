@@ -7,11 +7,19 @@ var puzzleCell = function(){
     var self = this;
     self.value = ko.observable();
     self.isPuzzleProvided = ko.observable(false);
+    self.isIncorrect = ko.observable(false);
 }
 
 var sudoku = function(){
     var self = this;
     self.rows = ko.observableArray();
+    self.columns = ko.computed(function(){
+        return [];
+    });
+
+    self.regions = ko.computed(function(){
+        return [];
+    });
 
     self.createPuzzle = function(){
         self.rows.removeAll();
@@ -30,7 +38,62 @@ var sudoku = function(){
     }
 
     self.checkPuzzle = function() {
+        for(r in self.rows()){
+            self._checkSet(self.rows()[r].columns());
+        }
+
+        for(c in self.columns()){
+            self._checkSet(self.columns()[c]);
+        }
+
+        for(r in self.regions()){
+            self._checkSet(self.columns()[r]);
+        }
+
+        for(r in self.rows()){
+            var row = self.rows()[r];
+            for(c in row.columns()){
+                var column = row.columns()[r];
+                if(column.value()){
+                    if(column.isIncorrect){
+                        return false;
+                    }
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+        return true;
     }    
+
+    self._checkSet = function(set){
+        var vals = {};
+        //create a blank dictionary for all values
+        for(var i = 1; i <= 9; i++){
+            vals[i] = [];
+        }
+
+        //put each set value into the dictionary
+        for(s in set){
+            if(set[s].value()){
+                vals[parseInt(set[s].value())].push(set[s]);
+            }
+        }
+
+        //check that each value in the dictionary only has one entry
+        //otherwise those values from the set are wrong.
+        for(x in vals){
+            var incorrect = false;
+            if(vals[x].length > 1){
+                incorrect = true;
+            }
+            for(v in vals[x]){
+                vals[x][v].isIncorrect(incorrect);
+            }
+        }        
+    }
+
     self.resetPuzzle = function() {
         ko.utils.arrayForEach(self.rows(), function(row){
             ko.utils.arrayForEach(row.columns(), function(col){
