@@ -77,8 +77,9 @@ var sudoku = function(){
     }
 
     self.checkPuzzle = function() {
+        self._resetCorrectness();
         for(r in self.rows()){
-            self._checkSet(self.rows()[r].columns());
+                self._checkSet(self.rows()[r].columns());
         }
 
         for(c in self.columns()){
@@ -93,8 +94,13 @@ var sudoku = function(){
             var row = self.rows()[r];
             for(c in row.columns()){
                 var column = row.columns()[r];
-                if(column.value()){
-                    if(column.isIncorrect){
+                if(column){
+                    if(column.value()){
+                        if(column.isIncorrect()){
+                            return false;
+                        }
+                    }
+                    else{
                         return false;
                     }
                 }
@@ -115,8 +121,10 @@ var sudoku = function(){
 
         //put each set value into the dictionary
         for(s in set){
-            if(set[s].value()){
-                vals[parseInt(set[s].value())].push(set[s]);
+            if(set[s]){
+                if(set[s].value()){
+                    vals[parseInt(set[s].value())].push(set[s]);
+                }
             }
         }
 
@@ -128,7 +136,10 @@ var sudoku = function(){
                 incorrect = true;
             }
             for(v in vals[x]){
-                vals[x][v].isIncorrect(incorrect);
+                //if the value isn't currently set as incorrect, set it how we found it in this check.
+                if(!vals[x][v].isIncorrect()){
+                    vals[x][v].isIncorrect(incorrect);
+                }
             }
         }        
     }
@@ -139,6 +150,14 @@ var sudoku = function(){
                 if(!col.isPuzzleProvided()){
                     col.value(null);
                 }
+            });
+        });
+        self._resetCorrectness();
+    }
+
+    self._resetCorrectness = function(){
+        ko.utils.arrayForEach(self.rows(), function(row){
+            ko.utils.arrayForEach(row.columns(), function(col){
                 col.isIncorrect(false); 
             });
         });
