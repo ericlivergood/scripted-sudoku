@@ -65,8 +65,13 @@ var sudoku = function(){
             var row = self.rows()[r];
             for(c in row.columns()){
                 var column = row.columns()[r];
-                if(column.value()){
-                    if(column.isIncorrect){
+                if(column){
+                    if(column.value()){
+                        if(column.isIncorrect()){
+                            return false;
+                        }
+                    }
+                    else{
                         return false;
                     }
                 }
@@ -87,8 +92,10 @@ var sudoku = function(){
 
         //put each set value into the dictionary
         for(s in set){
-            if(set[s].value()){
-                vals[parseInt(set[s].value())].push(set[s]);
+            if(set[s]){
+                if(set[s].value()){
+                    vals[parseInt(set[s].value())].push(set[s]);
+                }
             }
         }
 
