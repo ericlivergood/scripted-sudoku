@@ -61,26 +61,20 @@ var sudoku = function(){
             self._checkSet(self.columns()[r]);
         }
 
-        for(r in self.rows()){
-            var row = self.rows()[r];
-            for(c in row.columns()){
-                var column = row.columns()[r];
-                if(column){
-                    if(column.value()){
-                        if(column.isIncorrect()){
-                            return false;
-                        }
-                    }
-                    else{
-                        return false;
+        var solved = true;
+        ko.utils.arrayForEach(self.rows(), function(row){
+            ko.utils.arrayForEach(row.columns(), function(col){
+                if(col){
+                    if(!col.value() || col.isIncorrect()){
+                        solved = false;
                     }
                 }
                 else{
-                    return false;
+                    solved = false;
                 }
-            }
-        }
-        return true;
+            });
+        });
+        return solved;
     }    
 
     self._checkSet = function(set){
