@@ -11,7 +11,7 @@ var puzzleCell = function(x,y){
     self.x = x;
     self.y = y;
     self.region = function(){
-        return (x%3) + Math.floor(y/3)*3;
+        return Math.floor(x/3) + Math.floor(y/3)*3;
     }
 }
 
@@ -63,7 +63,16 @@ var sudoku = function(){
     });
 
     self.regions = ko.computed(function(){
-        return [];
+        var regions = []
+
+        for(var r = 0; r < 9; r++){
+            regions.push({cells:[]});
+        }
+        ko.utils.arrayForEach(self.cells(), function(c){
+            regions[c.region()].cells.push(c);
+        });
+
+        return regions;
     });
 
     self.createPuzzle = function(){
@@ -108,16 +117,19 @@ var sudoku = function(){
 
     self.checkPuzzle = function() {
         self._resetCorrectness();
-        for(r in self.rows()){
-                self._checkSet(self.rows()[r].columns);
+        var rows = self.rows();
+        for(r in rows){
+            self._checkSet(rows[r].columns);
         }
 
-        for(c in self.columns()){
-            self._checkSet(self.columns[c]);
+        var cols = self.columns();
+        for(c in cols){
+            self._checkSet(cols[c].rows);
         }
 
-        for(r in self.regions()){
-            self._checkSet(self.columns[r]);
+        var regions = self.regions();
+        for(r in regions){
+            self._checkSet(regions[r].cells);
         }
 
         for(var c in self.cells()){
