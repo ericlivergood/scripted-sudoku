@@ -176,7 +176,7 @@ var sudoku = function(){
         }
 
         for(var c in self.cells()){
-            var cell = self.cells[c];
+            var cell = self.cells()[c];
             if(cell){
                 if(cell.value()){
                     if(cell.isIncorrect()){
@@ -227,12 +227,10 @@ var sudoku = function(){
     }
 
     self.resetPuzzle = function() {
-        ko.utils.arrayForEach(self.rows(), function(row){
-            ko.utils.arrayForEach(row.columns(), function(col){
-                if(!col.isPuzzleProvided()){
-                    col.value(null);
-                }
-            });
+        ko.utils.arrayForEach(self.cells(), function(cell){
+            if(!cell.isPuzzleProvided()){
+                cell.value(null);
+            }
         });
         self._resetCorrectness();
     }
