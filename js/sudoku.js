@@ -8,6 +8,19 @@ var puzzleCell = function(x,y){
     self.region = function(){
         return Math.floor(x/3) + Math.floor(y/3)*3;
     }
+    self.regionBottom = ko.computed(function(){
+        return(self.y%3 == 2);
+    });
+    self.regionRight = ko.computed(function(){
+        return(self.x%3 == 2);
+    });
+    self.regionLeft = ko.computed(function(){
+        return(self.x%3 == 0);
+    });
+    self.regionTop = ko.computed(function(){
+        return(self.y%3 == 0);
+    });        
+
 }
 
 var sudoku = function(){
@@ -37,10 +50,10 @@ var sudoku = function(){
 
     self.rows = ko.computed(function(){
         rows = []
-        for(var x = 0; x < 9; x++){
+        for(var y = 0; y < 9; y++){
             rows.push({columns:[]})
-            for(var y = 0; y < 9; y++){
-                rows[x].columns.push(self._findCell(x,y));
+            for(var x = 0; x < 9; x++){
+                rows[y].columns.push(self._findCell(x,y));
             }
         }
         return rows;
@@ -48,10 +61,10 @@ var sudoku = function(){
 
     self.columns = ko.computed(function(){
         var cols = []
-        for(var y = 0; y < 9; y++){
+        for(var x = 0; x < 9; x++){
             cols.push({rows:[]})
-            for(var x = 0; x < 9; x++){
-                cols[y].rows.push(self._findCell(x,y));
+            for(var y = 0; y < 9; y++){
+                cols[x].rows.push(self._findCell(x,y));
             }
         }
         return cols;
