@@ -81,8 +81,8 @@ var sudoku = function(){
         }
 
         
-        for(var i = 0; i < 10000; i++){
-            var operation = Math.floor(Math.random()*100)%1;
+        for(var i = 0; i < 100000; i++){
+            var operation = Math.floor(Math.random()*100)%4;
             var grp = Math.floor(Math.random()*100)%3;
             var r1 = Math.floor(Math.random()*100)%3;  
             var r2 = Math.floor(Math.random()*100)%3;               
