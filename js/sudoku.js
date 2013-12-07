@@ -71,44 +71,92 @@ var sudoku = function(){
     });
 
     self.createPuzzle = function(){
-        self._blankPuzzle();
-
-        var tries = 10;
-        var totalTries = 0;
-
-        var rand = function() { return Math.floor(Math.random()*100)%9; }
-        var setCells = [];
-
-        while(setCells.length < 81 && totalTries < 100){
-            var randomCell = self._findCell(rand(), rand());
-
-            if(!randomCell.value()){
-                //assign a random value
-                randomCell.value(rand()+1);
-                //check the puzzle
-                self.checkPuzzle();
-
-                //if the new cell caused a problem, unset it
-                if(randomCell.isIncorrect()){
-                    randomCell.value(null);
-
-                    tries--;
-                    if(tries <= 0){
-                        if(setCells.length > 0){
-                            setCells.pop().value(null);
-                        }
-                        tries = 10;
-                    }
-                }
-                else{
-                    setCells.push(randomCell);
-                    tries = 10;
-                }
-                totalTries++;
+        var newPuzzle = [];
+        for(var i = 0; i < 9; i++)
+        {
+            newPuzzle.push([]);
+            for(var j = 0; j < 9; j++){
+                newPuzzle[i][j] = staticBase[i][j];
             }
+        }
 
+        
+        for(var i = 0; i < 10000; i++){
+            var operation = Math.floor(Math.random()*100)%1;
+            var grp = Math.floor(Math.random()*100)%3;
+            var r1 = Math.floor(Math.random()*100)%3;  
+            var r2 = Math.floor(Math.random()*100)%3;               
+
+            switch(operation){
+                case 0:
+                    self._swapRows(newPuzzle, grp*3+r1, grp*3+r2);
+                    break;
+                case 1:            
+                    self._swapColumns(newPuzzle, grp*3+r1, grp*3+r2);
+                    break;
+                case 2:       
+                    self._swapColumnRegions(newPuzzle, r1, r2);
+                    break;
+                case 3:                 
+                    self._swapRowRegions(newPuzzle, r1, r2);
+                    break;
+            }
+        }
+
+        var numToRemove = Math.floor(Math.random()*30)+ 20
+
+        for(var i = 0; i < numToRemove; ){
+            var x = Math.floor(Math.random()*100)%9;  
+            var y = Math.floor(Math.random()*100)%9;     
+
+            if(newPuzzle[x][y]){
+                newPuzzle[x][y] = null;
+                i++;
+            }       
+        }
+
+
+        self._setPuzzle(newPuzzle);
+    }
+
+    self._setPuzzle = function(puzzleArray){
+        self._blankPuzzle();
+        for(var i = 0; i < 9; i++){
+            for(var j = 0; j < 9; j++){
+                var c = self._findCell(j,i);
+                c.value(puzzleArray[i][j]);
+                if(c.value()){
+                    c.isPuzzleProvided(true);
+                    c.isIncorrect(false);
+                }
+            }
         }
     }
+
+    self._swapRows = function(puzzleArray,i,j){
+        var tmp = puzzleArray[i];
+        puzzleArray[i] = puzzleArray[j];
+        puzzleArray[j] = tmp;
+    }
+    self._swapColumns = function(puzzleArray,i,j){
+        var tmp;
+        for(var x = 0; x < 9; x++){
+            tmp = puzzleArray[x][i];
+            puzzleArray[x][i] = puzzleArray[x][j];
+            puzzleArray[x][j] = tmp;
+        }
+    }
+    self._swapRowRegions = function(puzzleArray,i,j){
+        self._swapRows(puzzleArray, i*3, j*3);
+        self._swapRows(puzzleArray, i*3+1, j*3+1);
+        self._swapRows(puzzleArray, i*3+2, j*3+2);
+    }
+    self._swapColumnRegions = function(puzzleArray,i,j){
+        self._swapColumns(puzzleArray, i*3, j*3);
+        self._swapColumns(puzzleArray, i*3+1, j*3+1);
+        self._swapColumns(puzzleArray, i*3+2, j*3+2);
+    }
+
 
     self.checkPuzzle = function() {
         self._resetCorrectness();
