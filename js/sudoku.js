@@ -3,11 +3,16 @@ var puzzleRow = function(){
     self.columns = ko.observableArray();
 }
 
-var puzzleCell = function(){
+var puzzleCell = function(x,y){
     var self = this;
     self.value = ko.observable();
     self.isPuzzleProvided = ko.observable(false);
     self.isIncorrect = ko.observable(false);
+    self.x = x;
+    self.y = y;
+    self.region = function(){
+        return (x%3) + Math.floor(y/3)*3;
+    }
 }
 
 var sudoku = function(){
@@ -33,47 +38,54 @@ var sudoku = function(){
 
     self.createPuzzle = function(){
         self.rows.removeAll();
+
+        //create blank puzzle
         for(var i = 0; i < 9; i++){
             self.rows.push(new puzzleRow());
             for(var j = 0; j < 9; j++){
-                var cell = new puzzleCell();
-
-                if(staticPuzzle[i][j]){
-                    cell.value(staticPuzzle[i][j]);
-                    cell.isPuzzleProvided(true);
-                }
+                var cell = new puzzleCell(j, i);
                 self.rows()[i].columns.push(cell);
-            }
-        }
-    }
 
-
-    self._createRandomPuzzle = function(blanks){
-        var rotationsToAttempt = 1000;
-        var maxCellsPerRotation = 10;
-        var puzz = staticBase;
-
-        //take the base puzzle and try rotating some cells
-        //if still valid, leave them; otherwise put them back
-        for(var i = 0; i < rotationsToAttempt; i++){
-            var cellsToRotate = (Math.floor(Math.random()*100)%(maxCellsPerRotation-3)+3; //we want to always rotate at least 3
-
-            var current = _getRandomPair();
-            for(int j = 0; j < cellsToRotate; j++){
-                pairs.push(_getRandomPair());
             }
         }
 
-        //remove some of the values
+        var tries = 10;
+        var totalTries = 0;
 
-        //return what's left
-    }
+        var rand = function() { return Math.floor(Math.random()*100)%9; }
+        var setCells = [];
 
-    self._getRandomPair(){
-        return [
-            (Math.floor(Math.random()*100))%9,
-            (Math.floor(Math.random()*100))%9
-        ];
+        while(setCells.length < 81 && totalTries < 100){
+            var randomCell = self
+                    .rows()[rand()]
+                    .columns()[rand()];
+
+            if(!randomCell.value()){
+                //assign a random value
+                randomCell.value(rand()+1);
+                //check the puzzle
+                self.checkPuzzle();
+
+                //if the new cell caused a problem, unset it
+                if(randomCell.isIncorrect()){
+                    randomCell.value(null);
+
+                    tries--;
+                    if(tries <= 0){
+                        if(setCells.length > 0){
+                            setCells.pop().value(null);
+                        }
+                        tries = 10;
+                    }
+                }
+                else{
+                    setCells.push(randomCell);
+                    tries = 10;
+                }
+                totalTries++;
+            }
+
+        }
     }
 
     self.checkPuzzle = function() {
