@@ -1,8 +1,3 @@
-var puzzleRow = function(){
-    var self = this;
-    self.columns = ko.observableArray();
-}
-
 var puzzleCell = function(x,y){
     var self = this;
     self.value = ko.observable();
