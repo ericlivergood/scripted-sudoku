@@ -17,18 +17,48 @@ var puzzleCell = function(x,y){
 
 var sudoku = function(){
     var self = this;
-    self.rows = ko.observableArray();
-    self.columns = ko.computed(function(){
-        var cols = []
+    self.cells = ko.observableArray();
+
+    self._blankPuzzle = function(){
+        var blankCells = []
+
         for(var i = 0; i < 9; i++){
-            cols.push([])
-            for(var j  = 0; j < 9; j    ++){
-                if(self.rows()[j]){
-                    cols[i][j] = self.rows()[j].columns()[i];
-                }
+            for(var j = 0; j < 9; j++){
+                var cell = new puzzleCell(i, j);
+                blankCells.push(cell);
+            }
+        }       
+        self.cells(blankCells);
+    }
+    self._blankPuzzle();
+
+    self._findCell = function(x,y){
+        for(var i = 0; i < self.cells().length; i++){
+            if(self.cells()[i].x == x && self.cells()[i].y == y){
+                return self.cells()[i];
             }
         }
+    }
 
+    self.rows = ko.computed(function(){
+        rows = []
+        for(var x = 0; x < 9; x++){
+            rows.push({columns:[]})
+            for(var y = 0; y < 9; y++){
+                rows[x].columns.push(self._findCell(x,y));
+            }
+        }
+        return rows;
+    });
+
+    self.columns = ko.computed(function(){
+        var cols = []
+        for(var y = 0; y < 9; y++){
+            cols.push({rows:[]})
+            for(var x = 0; x < 9; x++){
+                cols[y].rows.push(self._findCell(x,y));
+            }
+        }
         return cols;
     });
 
@@ -37,17 +67,7 @@ var sudoku = function(){
     });
 
     self.createPuzzle = function(){
-        self.rows.removeAll();
-
-        //create blank puzzle
-        for(var i = 0; i < 9; i++){
-            self.rows.push(new puzzleRow());
-            for(var j = 0; j < 9; j++){
-                var cell = new puzzleCell(j, i);
-                self.rows()[i].columns.push(cell);
-
-            }
-        }
+        self._blankPuzzle();
 
         var tries = 10;
         var totalTries = 0;
@@ -56,9 +76,7 @@ var sudoku = function(){
         var setCells = [];
 
         while(setCells.length < 81 && totalTries < 100){
-            var randomCell = self
-                    .rows()[rand()]
-                    .columns()[rand()];
+            var randomCell = self._findCell(rand(), rand());
 
             if(!randomCell.value()){
                 //assign a random value
@@ -91,34 +109,31 @@ var sudoku = function(){
     self.checkPuzzle = function() {
         self._resetCorrectness();
         for(r in self.rows()){
-                self._checkSet(self.rows()[r].columns());
+                self._checkSet(self.rows()[r].columns);
         }
 
         for(c in self.columns()){
-            self._checkSet(self.columns()[c]);
+            self._checkSet(self.columns[c]);
         }
 
         for(r in self.regions()){
-            self._checkSet(self.columns()[r]);
+            self._checkSet(self.columns[r]);
         }
 
-        for(r in self.rows()){
-            var row = self.rows()[r];
-            for(c in row.columns()){
-                var column = row.columns()[r];
-                if(column){
-                    if(column.value()){
-                        if(column.isIncorrect()){
-                            return false;
-                        }
-                    }
-                    else{
+        for(var c in self.cells()){
+            var cell = self.cells[c];
+            if(cell){
+                if(cell.value()){
+                    if(cell.isIncorrect()){
                         return false;
                     }
                 }
                 else{
                     return false;
                 }
+            }
+            else{
+                return false;
             }
         }
         return true;
@@ -168,10 +183,8 @@ var sudoku = function(){
     }
 
     self._resetCorrectness = function(){
-        ko.utils.arrayForEach(self.rows(), function(row){
-            ko.utils.arrayForEach(row.columns(), function(col){
-                col.isIncorrect(false); 
-            });
+        ko.utils.arrayForEach(self.cells(), function(cell){
+                cell.isIncorrect(false); 
         });
     }
 }
